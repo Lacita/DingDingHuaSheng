@@ -36,9 +36,6 @@ const options = {
             {
               path: 'query',
               name: '打卡记录查询',
-              meta: {
-                authority: 'queryForm',
-              },
               component: () => import('@/pages/list/QueryList'),
             },
             {

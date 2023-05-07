@@ -37,12 +37,8 @@ function hasRole(authority, roles) {
  * (r: String, s: String|Object) => boolean
  * @returns {boolean}
  */
-function hasAnyItem(required, source, filter) {
-  if (!required) {
-    return false
-  }
-  let checkedList = Array.isArray(required) ? required : [required]
-  return !!source.find(s => checkedList.find(r => filter(r, s)))
+function hasAnyItem() {
+
 }
 
 /**

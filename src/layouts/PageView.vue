@@ -1,4 +1,5 @@
 <template>
+  <a-spin size="large" tip="加载中...." :spinning="loading">
   <page-layout :desc="desc" :linkList="linkList">
     <div v-if="this.extraImage && !isMobile" slot="extra" class="extraImg">
       <img :src="extraImage"/>
@@ -7,6 +8,7 @@
         <router-view ref="page" />
     </page-toggle-transition>
   </page-layout>
+  </a-spin>
 </template>
 
 <script>
@@ -23,7 +25,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('setting', ['isMobile', 'multiPage', 'animate']),
+    ...mapState('setting', ['isMobile', 'multiPage', 'animate','loading']),
     desc() {
       return this.page.desc
     },
