@@ -12,6 +12,7 @@ const customTitles = (customTitlesStr && JSON.parse(customTitlesStr)) || []
 export default {
   namespaced: true,
   state: {
+    loading: false,
     isMobile: false,
     animates: ADMIN.animates,
     palettes: ADMIN.palettes,
@@ -51,6 +52,9 @@ export default {
     }
   },
   mutations: {
+    setLoading (state , isLoading) {
+      state.loading = isLoading
+    },
     setDevice (state, isMobile) {
       state.isMobile = isMobile
     },

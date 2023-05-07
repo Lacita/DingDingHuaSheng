@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Cookie from 'js-cookie'
-
+import store from "@/store";
+import {message} from "ant-design-vue";
 // 跨域认证信息 header 名
 const xsrfHeaderName = 'Authorization'
 
@@ -102,37 +103,76 @@ function checkAuthorization(authType = AUTH_TYPE.BEARER) {
  * @param interceptors
  * @param options
  */
-function loadInterceptors(interceptors, options) {
-  const {request, response} = interceptors
-  // 加载请求拦截器
-  request.forEach(item => {
-    let {onFulfilled, onRejected} = item
-    if (!onFulfilled || typeof onFulfilled !== 'function') {
-      onFulfilled = config => config
+// function loadInterceptors(interceptors, options) {
+//   const {request, response} = interceptors
+//   // 加载请求拦截器
+//   request.forEach(item => {
+//     let {onFulfilled, onRejected} = item
+//     if (!onFulfilled || typeof onFulfilled !== 'function') {
+//       onFulfilled = config => config
+//     }
+//     if (!onRejected || typeof onRejected !== 'function') {
+//       onRejected = error => Promise.reject(error)
+//     }
+//     axios.interceptors.request.use(
+//       config => onFulfilled(config, options),
+//       error => onRejected(error, options)
+//     )
+//   })
+//   // 加载响应拦截器
+//   response.forEach(item => {
+//     let {onFulfilled, onRejected} = item
+//     if (!onFulfilled || typeof onFulfilled !== 'function') {
+//       onFulfilled = response => response
+//     }
+//     if (!onRejected || typeof onRejected !== 'function') {
+//       onRejected = error => Promise.reject(error)
+//     }
+//     axios.interceptors.response.use(
+//       response => onFulfilled(response, options),
+//       error => onRejected(error, options)
+//     )
+//   })
+// }
+
+function loadInterceptors(){
+
+  axios.interceptors.request.use(function (config) {
+    // this.$store.commit('setting/setLoading',true)
+    // store.state["setting/loading"] = true
+    store.commit("setting/setLoading",true)
+    return config
+  }, function (error) {
+    if(error.code === 'ECONNABORTED' || error.message ===   "Network Error" ||  error.message.includes("timeout")){
+      store.commit("setting/setLoading",false)
+      this.$message({
+        message: '请求超时，请稍后重试',
+        type: "error",
+        duration: 3 * 1000,
+      })
     }
-    if (!onRejected || typeof onRejected !== 'function') {
-      onRejected = error => Promise.reject(error)
+    return Promise.resolve(error.response);
+    // return Promise.reject(error)
+  });
+  axios.interceptors.response.use(function (response) {
+    // this.$store.commit('setting/setLoading',false)
+    // store.state["setting/loading"] = true
+    store.commit("setting/setLoading",false)
+    return response
+  }, function (error) {
+    if(error.code === 'ECONNABORTED' || error.message ===   "Network Error" ||  error.message.includes("timeout")){
+      store.commit("setting/setLoading",false)
+      message.error('请求超时')
     }
-    axios.interceptors.request.use(
-      config => onFulfilled(config, options),
-      error => onRejected(error, options)
-    )
+    return Promise.resolve(error.response);
+    // return Promise.reject(error)
   })
-  // 加载响应拦截器
-  response.forEach(item => {
-    let {onFulfilled, onRejected} = item
-    if (!onFulfilled || typeof onFulfilled !== 'function') {
-      onFulfilled = response => response
-    }
-    if (!onRejected || typeof onRejected !== 'function') {
-      onRejected = error => Promise.reject(error)
-    }
-    axios.interceptors.response.use(
-      response => onFulfilled(response, options),
-      error => onRejected(error, options)
-    )
-  })
+
 }
+
+
+
+
 
 /**
  * 解析 url 中的参数

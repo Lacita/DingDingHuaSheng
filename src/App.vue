@@ -49,7 +49,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('setting', ['layout', 'theme', 'weekMode', 'lang'])
+    ...mapState('setting', ['layout', 'theme', 'weekMode', 'lang','loading'])
   },
   methods: {
     ...mapMutations('setting', ['setDevice']),

@@ -76,7 +76,6 @@
         </span>
       </a-form>
     </div>
-    <a-spin :spinning="loading">
     <div>
       <standard-table
         :columns="columns"
@@ -87,7 +86,6 @@
       >
       </standard-table>
     </div>
-    </a-spin>
   </a-card>
 </template>
 
@@ -158,7 +156,6 @@ export default {
   data () {
     return {
       advanced: true,
-      loading: true,
       columns: columns,
       dataSource: [],
       formState: {
@@ -200,7 +197,6 @@ export default {
         'type': this.formState.type
       }
      await doExportData(exportData).then(res => {
-        console.log(res)
         const blob = new Blob([res.data], { type: 'application/xlsx' })
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
@@ -218,7 +214,6 @@ export default {
       doSearchQuery(params).then(res => {
         this.dataSource = res.data.data.data
         this.pagination.total = res.data.data.total
-        this.loading = false
       })
     },
     toggleAdvanced () {
