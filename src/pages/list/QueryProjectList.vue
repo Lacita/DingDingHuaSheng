@@ -53,27 +53,28 @@
       </a-modal>
     </div>
     <div>
-      <standard-table
+      <a-table
         :columns="columns"
+        :rowKey="dataSource.id"
         :dataSource="dataSource"
         :showToast="`共${this.pagination.total}条数据`"
         :pagination="{...pagination, onChange: onPageChange}"
         @selectedRowChange="handleTableChange"
       >
-      </standard-table>
+        <a slot="id" slot-scope="text" @click="doOperate(text)">Operate</a>
+      </a-table>
     </div>
   </a-card>
 </template>
 
 <script>
-import StandardTable from '@/components/table/StandardTable'
 import {addProject, doSearchQuery, getProject} from "@/api/getCallInRecord";
 const columns = [
   {
     title: '项目编号',
     dataIndex: 'projectId',
     width: 100,
-    align: 'center'
+    align: 'center',
   },
   {
     title: '项目名称',
@@ -85,19 +86,33 @@ const columns = [
     title: '项目状态',
     dataIndex: 'projectStatus',
     width: 150,
-    align: 'center'
+    align: 'center',
+    customRender: (text) => {
+      if (text === 0){
+        return '禁用';
+      }
+      else{
+        return '正常';
+      }
+  }
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
     width: 100,
     align: 'center'
+  },
+  {
+    title: '操作',
+    width: 100,
+    align: 'center',
+    dataIndex: 'id',
+    scopedSlots: { customRender: 'id' }
   }
 ]
 
 export default {
   name: 'QueryList',
-  components: {StandardTable},
   data () {
     return {
       addProjectId: '',
@@ -124,6 +139,9 @@ export default {
     this.getData()
   },
   methods: {
+    doOperate(id){
+      console.log(id)
+    },
      handleOk() {
       let formData = new FormData()
       formData.append('projectId',this.addProjectId)
