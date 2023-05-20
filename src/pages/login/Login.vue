@@ -5,7 +5,7 @@
         <img alt="logo" class="logo" src="@/assets/img/conpanyLogo.png" />
         <span class="title">{{systemName}}</span>
       </div>
-      <div class="desc">广东华升纳米科技有限公司</div>
+      <div class="desc">广东华升纳米科技股份有限公司</div>
     </div>
     <div class="login">
       <a-form  :form="form">

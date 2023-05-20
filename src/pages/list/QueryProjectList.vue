@@ -6,14 +6,24 @@
           <a-row >
           <a-col :md="8" :sm="24" >
             <a-form-item
-              label="项目名称"
+              label="项目编号"
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
-              <a-input-number style="width: 100%" placeholder="请输入" v-model="formState.projectName" />
+              <a-input style="width: 100%" placeholder="项目编号" v-model="formState.projectId" />
             </a-form-item>
           </a-col>
+            <a-col :md="8" :sm="24" >
+              <a-form-item
+                  label="项目名称"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 18, offset: 1}"
+              >
+                <a-input style="width: 100%" placeholder="项目名称" v-model="formState.projectName" />
+              </a-form-item>
+            </a-col>
         </a-row>
+
         </div>
         <span style="float: right; margin-top: 3px;">
           <a-button type="primary" @click="doSearch">查询</a-button>
@@ -55,7 +65,7 @@
     <div>
       <a-table
         :columns="columns"
-        :rowKey="dataSource.id"
+        :rowKey="record=>record.id"
         :dataSource="dataSource"
         :showToast="`共${this.pagination.total}条数据`"
         :pagination="{...pagination, onChange: onPageChange}"
@@ -64,11 +74,19 @@
         <a slot="id" slot-scope="text" @click="doOperate(text)">Operate</a>
       </a-table>
     </div>
+    <a-modal
+        title="变更"
+        :visible="showEditVision"
+        @ok="handleOkDoOperate"
+        @cancel="handleCancelOperate"
+    >
+      <p>确定调整打卡项目状态？</p>
+    </a-modal>
   </a-card>
 </template>
 
 <script>
-import {addProject, doSearchQuery, getProject} from "@/api/getCallInRecord";
+import {addProject, doOperateUpdate, getProject} from "@/api/getCallInRecord";
 const columns = [
   {
     title: '项目编号',
@@ -115,15 +133,17 @@ export default {
   name: 'QueryList',
   data () {
     return {
+      tempProjectId: '',
+      showEditVision: false,
       addProjectId: '',
       addProjectName: '',
       advanced: true,
       confirmLoading: false,
-      loading:true,
       columns: columns,
       visible: false,
       dataSource: [],
       formState: {
+        projectId:'',
         projectName:''
       },
       pagination: {
@@ -135,13 +155,38 @@ export default {
     }
   },
   mounted() {
-    this.loading = false
     this.getData()
   },
   methods: {
-    doOperate(id){
-      console.log(id)
+    // 调整调整打卡项目状态
+    handleOkDoOperate(){
+      this.confirmEdit(this.tempProjectId)
     },
+    // 项目状态调整
+    confirmEdit(id){
+      let data = new FormData()
+      data.append('id',id)
+      doOperateUpdate(data).then(res => {
+        if (res.data.code === 2000){
+          this.$message.success('调整成功')
+          this.getData()
+        }
+        else{
+          this.$message.error('调整失败')
+        }
+      })
+      this.showEditVision = false
+    },
+    // 取消项目状态调整
+    handleCancelOperate(){
+      this.showEditVision =false
+    },
+    // 开启弹框，并传值修改的数据ID
+    doOperate(id){
+      this.showEditVision = true
+      this.tempProjectId = id
+    },
+    // 添加打卡项目
      handleOk() {
       let formData = new FormData()
       formData.append('projectId',this.addProjectId)
@@ -155,52 +200,50 @@ export default {
         }
       })
        setTimeout(() => {
+         this.addProjectId = '';
+         this.addProjectName = '';
         this.visible = false;
         this.confirmLoading = false;
         this.getData()
-      }, 1000);
+      }, 500);
     },
+    // 取消弹框展示
     handleCancel() {
       this.visible = false;
     },
+    // 打开项目新增弹框界面
     showModal() {
       this.visible = true;
     },
+    // 页面变化分页展示
     onPageChange(page, pageSize) {
       this.pagination.current = page
       this.pagination.pageSize = pageSize
-      this.getData()
-    },
-    getData() {
-      getProject(this.formState.projectName,1,10).then( res =>{
-            this.dataSource = res.data.data.data
-            this.pagination.total = res.data.data.total
-            this.loading = false
-      }
-      )
-    },
-    handleTableChange (page) {
-      const params = {
-        'startPage': page.current,
-        'size': 10
-      }
-      doSearchQuery(params).then(res => {
+      getProject(this.formState.projectId,this.formState.projectName,page,10).then(res =>{
         this.dataSource = res.data.data.data
         this.pagination.total = res.data.data.total
       })
     },
-    doSearch () {
-      const data = {
-        'dept': this.formState.dept,
-        'startTime': (this.formState.startTime) === "" ? (new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDay()) : (this.formState.startTime).format('YYYY-MM-DD'),
-        'endTime': (this.formState.endTime) === "" ? (new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDay()) : (this.formState.endTime).format('YYYY-MM-DD'),
-        'title': this.formState.title,
-        'userName': this.formState.userName,
-        'type': this.formState.type,
-        'startPage': 0,
-        'size': 10
+    // 初始化获取出局
+    getData() {
+      getProject(this.formState.projectId,this.formState.projectName,1,10).then( res =>{
+            this.dataSource = res.data.data.data
+            this.pagination.total = res.data.data.total
       }
-      doSearchQuery(data).then(res => {
+      )
+    },
+    // 页面触发执行方法
+    handleTableChange (page) {
+      console.log(page.current)
+      getProject(this.formState.projectId,this.formState.projectName,page.current,10).then(res => {
+        this.dataSource = res.data.data.data
+        this.pagination.total = res.data.data.total
+      })
+    },
+    // 查询方法
+    doSearch () {
+      getProject(this.formState.projectId,this.formState.projectName,1,10).then(res => {
+        console.log(res)
         this.dataSource = res.data.data.data
         this.pagination.total = res.data.data.total
       })

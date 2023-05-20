@@ -31,14 +31,14 @@
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
-              <a-input-number style="width: 100%" placeholder="请输入" v-model="formState.dept" />
+              <a-input style="width: 100%" placeholder="请输入" v-model="formState.dept" />
             </a-form-item>
           </a-col>
         </a-row>
           <a-row v-if="advanced">
           <a-col :md="8" :sm="24" >
             <a-form-item
-              label="打卡日期"
+              label="开始日期"
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
@@ -47,7 +47,7 @@
           </a-col>
             <a-col :md="8" :sm="24" >
               <a-form-item
-                  label="打卡日期"
+                  label="结束日期"
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
@@ -76,48 +76,31 @@
         </span>
       </a-form>
     </div>
-    <a-spin :spinning="loading">
     <div>
-      <standard-table
-        :columns="columns"
+      <a-table
+          :rowKey="record=>record.id"
+          bordered
+          :columns="columns"
         :dataSource="dataSource"
+          :scroll="{ x: 'max-content' }"
         :showToast="`共${this.pagination.total}条数据`"
         :pagination="{...pagination, onChange: onPageChange}"
         @selectedRowChange="handleTableChange"
       >
-      </standard-table>
+      </a-table>
     </div>
-    </a-spin>
   </a-card>
 </template>
 
 <script>
-import StandardTable from '@/components/table/StandardTable'
 import {doExportData, doSearchQuery} from "@/api/getCallInRecord";
 const columns = [
   {
     title: '员工姓名',
     dataIndex: 'userName',
     width: 100,
-    align: 'center'
-  },
-  {
-    title: '打卡日期',
-    dataIndex: 'clockDate',
-    width: 100,
-    align: 'center'
-  },
-  {
-    title: '打卡时间',
-    dataIndex: 'clockInTime',
-    width: 150,
-    align: 'center'
-  },
-  {
-    title: '打卡类型',
-    dataIndex: 'type',
-    width: 100,
-    align: 'center'
+    align: 'center',
+    fixed: 'left'
   },
   {
     title: '部门',
@@ -135,26 +118,91 @@ const columns = [
     align: 'center'
   },
   {
-    title: '打卡项目',
-    dataIndex: 'project',
+    title: '打卡日期',
+    dataIndex: 'clockDate',
     align: 'center'
+  },
+  {
+    title: '上班时间',
+    children:[
+      {
+        title: '上班时间',
+        dataIndex: 'clockInTime',
+        align: 'center'
+      },
+      {
+        title: '下班时间',
+        dataIndex: 'knockOffTime',
+        align: 'center'
+      },
+      {
+        title: '工作时长',
+        dataIndex: 'workTimeResult',
+        align: 'center'
+      }
+    ]
+  },
+  {
+    title: '加班时间',
+    children: [
+      {
+        title: '加班开始时间',
+        dataIndex: 'overTime',
+        align: 'center'
+      },
+      {
+        title: '加班结束时间',
+        dataIndex: 'overTimeEnd',
+        align: 'center'
+      },
+      {
+        title: '加班时长',
+        dataIndex: 'overTimeResult',
+        align: 'center'
+      }
+    ]
   },
   {
     title: '打卡位置',
     dataIndex: 'location',
     align: 'center',
-    width: 200
   },
   {
     title: '打卡备注',
     dataIndex: 'note',
+    align: 'center',
+  },
+  {
+    title: '打卡项目',
+    dataIndex: 'project',
     align: 'center'
-  }
+  },
+  {
+    title: '外勤地点',
+    children: [
+      {
+        title: '上班地点',
+        dataIndex: 'fieldLocation',
+        align: 'center'
+      },
+      {
+        title: '下班地点',
+        dataIndex: 'fieldKnockLocation',
+        align: 'center'
+      }
+    ]
+  },
+  {
+    title: '打卡类型',
+    dataIndex: 'callInType',
+    align: 'center',
+    width: 100,
+    fixed: 'right'
+  },
 ]
 
 export default {
   name: 'QueryList',
-  components: {StandardTable},
   data () {
     return {
       advanced: true,
@@ -188,19 +236,19 @@ export default {
     onPageChange(page, pageSize) {
       this.pagination.current = page
       this.pagination.pageSize = pageSize
-      this.getData()
+      // this.getData()
+      this.handleTableChange(page)
     },
     async doExport () {
       const exportData = {
         'dept': this.formState.dept,
-        'startTime': (this.formState.startTime) === '' ? (new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDay()) : (this.formState.startTime).format('YYYY-MM-DD'),
-        'endTime': (this.formState.endTime) === '' ? (new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDay()) : (this.formState.endTime).format('YYYY-MM-DD'),
+        'startTime': (this.formState.startTime) === '' ? null : (this.formState.startTime).format('YYYY-MM-DD'),
+        'endTime': (this.formState.endTime) === '' ? null : (this.formState.endTime).format('YYYY-MM-DD'),
         'title': this.formState.title,
         'userName': this.formState.userName,
         'type': this.formState.type
       }
      await doExportData(exportData).then(res => {
-        console.log(res)
         const blob = new Blob([res.data], { type: 'application/xlsx' })
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
@@ -218,7 +266,6 @@ export default {
       doSearchQuery(params).then(res => {
         this.dataSource = res.data.data.data
         this.pagination.total = res.data.data.total
-        this.loading = false
       })
     },
     toggleAdvanced () {
@@ -226,7 +273,13 @@ export default {
     },
     handleTableChange (page) {
       const params = {
-        'startPage': page.current,
+        'dept': this.formState.dept,
+        'startTime': (this.formState.startTime) === "" ? null : (this.formState.startTime).format('YYYY-MM-DD'),
+        'endTime': (this.formState.endTime) === "" ? null : (this.formState.endTime).format('YYYY-MM-DD'),
+        'title': this.formState.title,
+        'userName': this.formState.userName,
+        'type': this.formState.type,
+        'startPage': page,
         'size': 10
       }
       doSearchQuery(params).then(res => {
@@ -237,12 +290,12 @@ export default {
     doSearch () {
       const data = {
         'dept': this.formState.dept,
-        'startTime': (this.formState.startTime) === "" ? (new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDay()) : (this.formState.startTime).format('YYYY-MM-DD'),
-        'endTime': (this.formState.endTime) === "" ? (new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDay()) : (this.formState.endTime).format('YYYY-MM-DD'),
+        'startTime': (this.formState.startTime) === "" ? null : (this.formState.startTime).format('YYYY-MM-DD'),
+        'endTime': (this.formState.endTime) === "" ? null : (this.formState.endTime).format('YYYY-MM-DD'),
         'title': this.formState.title,
         'userName': this.formState.userName,
         'type': this.formState.type,
-        'startPage': 0,
+        'startPage': 1,
         'size': 10
       }
       doSearchQuery(data).then(res => {
