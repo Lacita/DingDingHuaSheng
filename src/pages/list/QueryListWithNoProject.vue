@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import {doExportData, doSearchQuery} from "@/api/getCallInRecord";
+import { doExportDataWithNoProject, doSearchQueryWithNoProject} from "@/api/getCallInRecord";
 const columns = [
   {
     title: '员工姓名',
@@ -203,7 +203,7 @@ const columns = [
 ]
 
 export default {
-  name: 'QueryList',
+  name: 'QueryListWithNoProject',
   data () {
     return {
       advanced: true,
@@ -249,7 +249,7 @@ export default {
         'userName': this.formState.userName,
         'type': this.formState.type
       }
-     await doExportData(exportData).then(res => {
+     await doExportDataWithNoProject(exportData).then(res => {
         const blob = new Blob([res.data], { type: 'application/xlsx' })
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
@@ -264,7 +264,7 @@ export default {
         'startPage': 1,
         'size': 10
       }
-      doSearchQuery(params).then(res => {
+      doSearchQueryWithNoProject(params).then(res => {
         this.dataSource = res.data.data.data
         this.pagination.total = res.data.data.total
       })
@@ -283,7 +283,7 @@ export default {
         'startPage': page,
         'size': 10
       }
-      doSearchQuery(params).then(res => {
+      doSearchQueryWithNoProject(params).then(res => {
         this.dataSource = res.data.data.data
         this.pagination.total = res.data.data.total
       })
@@ -299,7 +299,7 @@ export default {
         'startPage': 1,
         'size': 10
       }
-      doSearchQuery(data).then(res => {
+      doSearchQueryWithNoProject(data).then(res => {
         this.dataSource = res.data.data.data
         this.pagination.total = res.data.data.total
       })

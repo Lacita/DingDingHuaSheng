@@ -35,8 +35,13 @@ const options = {
           children: [
             {
               path: 'query',
-              name: '打卡记录查询',
+              name: '项目打卡记录查询',
               component: () => import('@/pages/list/QueryList'),
+            },
+            {
+              path: 'queryWithNoProject',
+              name: '非项目打卡记录查询',
+              component: () => import('@/pages/list/QueryListWithNoProject'),
             },
             {
               path: 'primary',

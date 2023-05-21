@@ -103,6 +103,7 @@ export default {
         // getRoutesConfig().then(result => {
         //   const routesConfig = result.data.data
         //   loadRoutes(routesConfig)
+          localStorage.setItem('token',loginRes.data);
           this.$router.push('/list/query')
           this.$message.success('登录成功！', 3)
         // })

@@ -1,6 +1,5 @@
 import {hasAuthority} from '@/utils/authority-utils'
 import {loginIgnore} from '@/router/index'
-import {checkAuthorization} from '@/utils/request'
 import NProgress from 'nprogress'
 
 NProgress.configure({ showSpinner: false })
@@ -28,7 +27,11 @@ const progressStart = (to, from, next) => {
  */
 const loginGuard = (to, from, next, options) => {
   const {message} = options
-  if (!loginIgnore.includes(to) && !checkAuthorization()) {
+  // if (!loginIgnore.includes(to) && !checkAuthorization()) {
+  //   message.warning('登录已失效，请重新登录')
+  //   next({path: '/login'})
+  // } else {
+  if (!loginIgnore.includes(to) && !localStorage.getItem("token")) {
     message.warning('登录已失效，请重新登录')
     next({path: '/login'})
   } else {

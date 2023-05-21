@@ -2,6 +2,7 @@ import axios from 'axios'
 import Cookie from 'js-cookie'
 import store from "@/store";
 import {message} from "ant-design-vue";
+
 // 跨域认证信息 header 名
 const xsrfHeaderName = 'Authorization'
 
@@ -138,8 +139,9 @@ function checkAuthorization(authType = AUTH_TYPE.BEARER) {
 function loadInterceptors(){
 
   axios.interceptors.request.use(function (config) {
-    // this.$store.commit('setting/setLoading',true)
-    // store.state["setting/loading"] = true
+    if (localStorage.getItem("token")) {
+      config.headers["token"] = localStorage.getItem("token"); // 让每个请求携带自定义 token 请根据实际情况自行修改
+    }
     store.commit("setting/setLoading",true)
     return config
   }, function (error) {
@@ -152,12 +154,16 @@ function loadInterceptors(){
       })
     }
     return Promise.resolve(error.response);
-    // return Promise.reject(error)
   });
   axios.interceptors.response.use(function (response) {
-    // this.$store.commit('setting/setLoading',false)
-    // store.state["setting/loading"] = true
     store.commit("setting/setLoading",false)
+    const data = response.data;
+    if (data.code === 4000){
+        message.error('登录失效');
+        setTimeout(()=>{
+          location.replace('/login')
+        },1000)
+    }
     return response
   }, function (error) {
     if(error.code === 'ECONNABORTED' || error.message ===   "Network Error" ||  error.message.includes("timeout")){
@@ -165,7 +171,6 @@ function loadInterceptors(){
       message.error('请求超时')
     }
     return Promise.resolve(error.response);
-    // return Promise.reject(error)
   })
 
 }
