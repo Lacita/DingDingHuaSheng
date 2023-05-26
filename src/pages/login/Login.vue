@@ -8,6 +8,7 @@
       <div class="desc">广东华升纳米科技股份有限公司</div>
     </div>
     <div class="login">
+      <a-spin :spinning="spinning" size="large" tip="登录中...">
       <a-form  :form="form">
         <a-tabs size="large" :tabBarStyle="{textAlign: 'center'}" style="padding: 0 2px;">
           <a-tab-pane tab="账户密码登录" key="1">
@@ -39,6 +40,7 @@
           <a-button :loading="logging" style="width: 100%;margin-top: 24px" size="large" htmlType="submit" type="primary" @click="login">登录</a-button>
         </a-form-item>
       </a-form>
+      </a-spin>
     </div>
   </common-layout>
 </template>
@@ -58,7 +60,8 @@ export default {
       error: '',
       form: this.$form.createForm(this),
       userName: '',
-      loginPassword: ''
+      loginPassword: '',
+      spinning: false
     }
   },
   computed: {
@@ -69,7 +72,9 @@ export default {
   methods: {
     ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
     login () {
+      this.spinning = true;
       doLogin(this.userName,this.loginPassword).then(res => {
+        this.spinning = false;
         if (res.data.code === 2000){
           this.afterLogin(res)
         }
@@ -77,18 +82,6 @@ export default {
           this.$message.error('登录失败')
         }
       })
-    },
-    onSubmit (e) {
-      console.log(e.preventDefault())
-      // e.preventDefault()
-      // this.form.validateFields((err) => {
-      //   if (!err) {
-      //     this.logging = true
-      //     const name = this.form.getFieldValue('name')
-      //     const password = this.form.getFieldValue('password')
-      //     login(name, password).then(this.afterLogin)
-      //   }
-      // })
     },
     afterLogin(res) {
       this.logging = false

@@ -1,8 +1,8 @@
 import {METHOD, request} from "@/utils/request";
 
 const recordApi = {
-    // baseUrl: 'http://www.oahuasheng.com:8090',
-    baseUrl: 'http://127.0.0.1:8090',
+    baseUrl: 'http://www.oahuasheng.com:8090',
+    // baseUrl: 'http://127.0.0.1:8090',
     getCallInRecord: '/hs/getClockInRecord',
     getCallInRecordWithNoProject: '/hs/getClockInRecordWithNoProject',
     exportData: '/hs/export',

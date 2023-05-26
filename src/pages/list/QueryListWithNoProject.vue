@@ -43,7 +43,7 @@
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
-              <a-date-picker style="width: 100%" placeholder="请输入打卡开始日期" v-model="formState.startTime" />
+              <a-date-picker style="width: 100%" placeholder="请输入打卡开始日期" v-model="formState.startTime" :allowClear="false" />
             </a-form-item>
           </a-col>
             <a-col :md="8" :sm="24" >
@@ -52,7 +52,7 @@
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
-                <a-date-picker style="width: 100%" placeholder="请输入打卡结束日期" v-model="formState.endTime" />
+                <a-date-picker style="width: 100%" placeholder="请输入打卡结束日期" v-model="formState.endTime" :allowClear="false" />
               </a-form-item>
             </a-col>
 
@@ -140,6 +140,21 @@ const columns = [
         title: '工作时长',
         dataIndex: 'workTimeResult',
         align: 'center'
+      },
+      {
+        title:'异常考勤',
+        children:[
+          {
+            'title':'迟到',
+            dataIndex: 'lateSituation',
+            align: 'center'
+          },
+          {
+            title:'早退',
+            dataIndex: 'earlySituation',
+            align: 'center'
+          }
+        ]
       }
     ]
   },
