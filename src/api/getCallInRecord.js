@@ -1,15 +1,17 @@
 import {METHOD, request} from "@/utils/request";
 
 const recordApi = {
-    baseUrl: 'http://www.oahuasheng.com:8090',
-    // baseUrl: 'http://127.0.0.1:8090',
+    // baseUrl: 'http://www.oahuasheng.com:8090',
+    baseUrl: 'http://127.0.0.1:8090',
     getCallInRecord: '/hs/getClockInRecord',
     getCallInRecordWithNoProject: '/hs/getClockInRecordWithNoProject',
     exportData: '/hs/export',
     exportDataWithNoProject:'/hs/exportWithNoProject',
     doLogin: '/hs/login',
     addProjectUrl: '/hs/addNewProject',
-    updateStatus: '/hs/updateProject'
+    updateStatus: '/hs/updateProject',
+    dingTalkLogin:'/ding-talk/login',
+    getTokenMessage:'/ding-talk/getJwtToken',
 }
 
 // export function doSearchQuery (data) {
@@ -52,4 +54,12 @@ export function addProject (data) {
 
 export function doOperateUpdate (id) {
     return request(recordApi.baseUrl+recordApi.updateStatus,METHOD.POST,id,{'Content-Type':'application/x-www-form-urlencoded'})
+}
+
+export function doDingTalkLogin(data){
+    return request(recordApi.baseUrl+recordApi.dingTalkLogin,METHOD.POST,data,{'content-type':'application/x-www-form-urlencoded'})
+}
+
+export function doGetJwtToken() {
+    return request(recordApi.baseUrl+recordApi.getTokenMessage,METHOD.POST)
 }

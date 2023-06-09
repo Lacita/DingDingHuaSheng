@@ -20,6 +20,11 @@ const options = {
       component: () => import('@/pages/exception/403'),
     },
     {
+      path:'/loading',
+      name:'loading',
+      component: () => import('@/pages/login/LoginLoading')
+    },
+    {
       path: '/',
       name: '首页',
       component: TabsView,
@@ -27,9 +32,9 @@ const options = {
       children: [
         {
           path: 'list',
-          name: '功能列表',
+          name: '打卡管理',
           meta: {
-            icon: 'table'
+            icon: 'history'
           },
           component: PageView,
           children: [
@@ -47,12 +52,36 @@ const options = {
               path: 'primary',
               name: '打卡项目管理',
               component: () => import('@/pages/list/QueryProjectList'),
+            },
+          ]
+        },
+        {
+          path: 'customer',
+          name: '商机管理',
+          meta: {
+            icon: 'solution'
+          },
+          component: PageView,
+          children: [
+            {
+              path: 'detail',
+              name: '项目进程细节',
+              component: () => import('@/pages/list/processProject'),
+            },
+            {
+              path: 'customerManager',
+              name: '客户管理',
+              component: () => import('@/pages/list/customerManager/CustomerIntendant'),
+            },
+            {
+              path: 'report',
+              name: '客户信息报表',
+              component: () => import('@/pages/list/report/Report'),
             }
           ]
         },
       ]
-    },
-  ]
-}
+    }
+  ]}
 
 export default options

@@ -2,7 +2,7 @@
   <a-dropdown>
     <div class="header-avatar" style="cursor: pointer">
       <a-avatar class="avatar" size="small" shape="circle" src="http://12966727.s21i.faiusr.com/4/ABUIABAEGAAgzsjSmwYo156s7AEw9gE4fg.png"/>
-      <span class="name">华升管理员</span>
+      <span class="name">{{userName}}</span>
     </div>
     <a-menu :class="['avatar-menu']" slot="overlay">
       <a-menu-divider />
@@ -15,18 +15,40 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapState} from 'vuex'
 import {logout} from '@/services/user'
+import {doGetJwtToken} from "@/api/getCallInRecord";
+import store from "@/store";
 
 export default {
   name: 'HeaderAvatar',
   computed: {
-    ...mapGetters('account', ['user']),
+    ...mapState('setting', ['isMobile','userName']),
+
+  },
+  mounted() {
+    this.setUserName()
   },
   methods: {
     logout() {
       logout()
       this.$router.push('/login')
+    },
+    setUserName() {
+      if (this.$store.state["setting/userName"] == null) {
+        doGetJwtToken().then(res=>{
+          if (res.data.code === 2000){
+            store.commit("setting/setUserName",res.data.data)
+          }
+          else {
+            this.message.error(res.data.data)
+          }
+        })
+      }
+      else {
+       return true
+      }
+
     }
   }
 }

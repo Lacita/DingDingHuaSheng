@@ -12,6 +12,7 @@ const customTitles = (customTitlesStr && JSON.parse(customTitlesStr)) || []
 export default {
   namespaced: true,
   state: {
+    userName:'',
     loading: false,
     isMobile: false,
     animates: ADMIN.animates,
@@ -52,6 +53,9 @@ export default {
     }
   },
   mutations: {
+    setUserName (state , userNameGet) {
+      state.userName = userNameGet
+    },
     setLoading (state , isLoading) {
       state.loading = isLoading
     },

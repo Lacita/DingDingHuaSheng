@@ -11,7 +11,10 @@
       <a-spin :spinning="spinning" size="large" tip="登录中...">
       <a-form  :form="form">
         <a-tabs size="large" :tabBarStyle="{textAlign: 'center'}" style="padding: 0 2px;">
-          <a-tab-pane tab="账户密码登录" key="1">
+          <a-tab-pane tab="钉钉扫码登录" key="1" >
+            <DingTalkLogin />
+          </a-tab-pane>
+          <a-tab-pane tab="账户密码登录" key="2">
             <a-alert type="error" :closable="true" v-show="error" :message="error" showIcon style="margin-bottom: 24px;" />
             <a-form-item>
               <a-input
@@ -34,10 +37,10 @@
                 <a-icon slot="prefix" type="lock" />
               </a-input>
             </a-form-item>
+            <a-button :loading="logging" style="width: 100%;margin-top: 24px" size="large" htmlType="submit" type="primary" @click="login">登录</a-button>
           </a-tab-pane>
         </a-tabs>
         <a-form-item>
-          <a-button :loading="logging" style="width: 100%;margin-top: 24px" size="large" htmlType="submit" type="primary" @click="login">登录</a-button>
         </a-form-item>
       </a-form>
       </a-spin>
@@ -50,10 +53,12 @@ import CommonLayout from '@/layouts/CommonLayout'
 import {setAuthorization} from '@/utils/request'
 import {mapMutations} from 'vuex'
 import {doLogin} from "@/api/getCallInRecord";
+import {Encrypt} from '@/utils/secret';
+import DingTalkLogin from "@/pages/login/DingTalkLogin.vue";
 
 export default {
   name: 'Login',
-  components: {CommonLayout},
+  components: {CommonLayout,DingTalkLogin},
   data () {
     return {
       logging: false,
@@ -73,7 +78,7 @@ export default {
     ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
     login () {
       this.spinning = true;
-      doLogin(this.userName,this.loginPassword).then(res => {
+      doLogin(this.userName,Encrypt(this.loginPassword)).then(res => {
         this.spinning = false;
         if (res.data.code === 2000){
           this.afterLogin(res)
